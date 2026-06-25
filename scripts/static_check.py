@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import argparse
 import ast
+import fnmatch
 import json
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,9 +22,19 @@ SKIP_PARTS = {
 
 
 def iter_paths(pattern: str) -> list[Path]:
+    result = subprocess.run(
+        ["git", "ls-files"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
     return sorted(
         path
-        for path in ROOT.rglob(pattern)
+        for rel_path in result.stdout.splitlines()
+        for path in [ROOT / rel_path]
+        if fnmatch.fnmatch(Path(rel_path).name, pattern)
+        if path.is_file()
         if not (set(path.relative_to(ROOT).parts) & SKIP_PARTS)
     )
 
