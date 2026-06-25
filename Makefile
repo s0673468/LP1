@@ -5,7 +5,7 @@ PYTHON ?= python3
 check: lint test
 
 lint:
-	$(PYTHON) scripts/static_check.py
+	$(PYTHON) scripts/static_check.py --require-notebook
 
 test:
 	@echo "No executable test suite configured; static validation runs in lint."
