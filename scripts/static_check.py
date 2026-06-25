@@ -47,7 +47,8 @@ def notebook_source(source: str | list[str]) -> str:
         if lowered.startswith(("pip install ", "python -m pip ", "conda install ")):
             continue
         cleaned.append(line)
-    return "\n".join(cleaned).strip() + "\n" if any(line.strip() for line in cleaned) else ""
+    text = "\n".join(cleaned)
+    return text.rstrip() + "\n" if text.strip() else ""
 
 
 def compile_source(source: str, filename: str, *, allow_top_level_await: bool = False) -> None:
