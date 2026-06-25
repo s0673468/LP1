@@ -50,12 +50,13 @@ def notebook_source(source: str | list[str]) -> str:
     return "\n".join(cleaned).strip() + "\n" if any(line.strip() for line in cleaned) else ""
 
 
-def compile_source(source: str, filename: str) -> None:
+def compile_source(source: str, filename: str, *, allow_top_level_await: bool = False) -> None:
+    flags = ast.PyCF_ALLOW_TOP_LEVEL_AWAIT if allow_top_level_await else 0
     compile(
         source,
         filename,
         "exec",
-        flags=ast.PyCF_ALLOW_TOP_LEVEL_AWAIT,
+        flags=flags,
         dont_inherit=True,
     )
 
@@ -78,7 +79,11 @@ def check_notebook(path: Path) -> None:
             continue
         source = notebook_source(cell.get("source", ""))
         if source:
-            compile_source(source, f"{path.relative_to(ROOT)}:cell-{index}")
+            compile_source(
+                source,
+                f"{path.relative_to(ROOT)}:cell-{index}",
+                allow_top_level_await=True,
+            )
 
 
 def check_requirements(require_pinned: bool, require_any: bool) -> None:
